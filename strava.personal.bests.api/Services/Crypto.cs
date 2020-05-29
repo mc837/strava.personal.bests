@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,16 +7,9 @@ namespace strava.personal.bests.api.Services
 {
     public class Crypto : ICrypto
     {
-        //private readonly IPropertyStore _propertyStore;
-
-        // public Crypto(IPropertyStore propertyStore)
-        // {
-        //     _propertyStore = propertyStore;
-        // }
         public string Encrypt(string key, string data)
         {
             string encData = null;
-            //var key = GetKey(property);
             var keys = GetHashKeys(key);
 
             try
@@ -35,11 +27,6 @@ namespace strava.personal.bests.api.Services
             var keys = GetHashKeys(key);
             return DecryptStringFromBytes_Aes(data, keys[0], keys[1]);
         }
-
-        // private string GetKey(IApplicationProperty property)
-        // {
-        //     return _propertyStore.Get(property);
-        // }
 
         private static byte[][] GetHashKeys(string key)
         {

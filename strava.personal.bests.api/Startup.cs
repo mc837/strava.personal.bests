@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using strava.personal.bests.api.Models;
 using strava.personal.bests.api.Services;
 
 namespace strava.personal.bests.api
@@ -22,6 +23,8 @@ namespace strava.personal.bests.api
             services.AddControllers();
             services.AddHttpClient();
             services.AddScoped<ICrypto, Crypto>();
+            services.Configure<StravaApiSettings>(Configuration.GetSection("stravaApi"));
+            services.Configure<StravaPersonalBestsSettings>(Configuration.GetSection("StravaPersonalBests"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
