@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using strava.personal.bests.api.Models;
 using strava.personal.bests.api.Models.Authentication;
 using strava.personal.bests.api.Services;
+using strava.personal.bests.api.Services.Interfaces;
 using System.Threading.Tasks;
 
 namespace strava.personal.bests.api.Filters
@@ -13,11 +14,13 @@ namespace strava.personal.bests.api.Filters
     {
         private readonly IOptions<StravaPersonalBestsSettings> _settings;
         private readonly ICrypto _crypto;
+        private readonly IStravaAuthService _stravaAuthService;
 
-        public AuthorizeStravaFilter(IOptions<StravaPersonalBestsSettings> settings, ICrypto crypto)
+        public AuthorizeStravaFilter(IOptions<StravaPersonalBestsSettings> settings, ICrypto crypto, IStravaAuthService stravaAuthService)
         {
             _settings = settings;
             _crypto = crypto;
+            _stravaAuthService = stravaAuthService;
         }
 
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
@@ -27,10 +30,23 @@ namespace strava.personal.bests.api.Filters
             {
                 context.Result = new UnauthorizedResult();
             }
+
             var decryptedCookie = _crypto.Decrypt(_settings.Value.CryptoSecret, spbAuthCookie);
             var stravaTokenModel = JsonConvert.DeserializeObject<StravaTokenModel>(decryptedCookie);
-            context.HttpContext.Items["access_token"] = stravaTokenModel.AccessToken;
-            //context.HttpContext.Response.Cookies.Append("spb", "diditwork");
+
+            int.TryParse(stravaTokenModel.ExpiresIn, out var expirySeconds);
+            if (expirySeconds > 30)
+            {
+                context.HttpContext.Items["access_token"] = stravaTokenModel.AccessToken;
+                return;
+            }
+
+            var refreshedAuthenticationResult = await _stravaAuthService.GetRefreshedToken(stravaTokenModel.RefreshToken);
+
+            if (refreshedAuthenticationResult.Authenticated == false) context.Result = new UnauthorizedResult(); //TODO: logging/ handle better?
+
+            context.HttpContext.Response.Cookies.Append("spb", refreshedAuthenticationResult.EncryptedAuthCookie);
+            context.HttpContext.Items["access_token"] = refreshedAuthenticationResult.AccessToken;
         }
     }
 

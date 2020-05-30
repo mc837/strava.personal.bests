@@ -37,9 +37,29 @@ namespace strava.personal.bests.api.Services
             return new AuthenticationResponseModel(true, encryptedAuthCookie, result.Athlete);
         }
 
-        public AuthenticationResponseModel GetRefreshToken(string code)
+        public async Task<AuthenticationRefreshResponseModel> GetRefreshedToken(string refreshToken)
         {
-            throw new System.NotImplementedException();
+            var getTokenResponse = await _stravaService.GetToken(GetAuthenticationRefreshRequestModel(refreshToken));
+
+            var content = await getTokenResponse.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<StravaTokenModel>(content);
+
+            if (getTokenResponse.IsSuccessStatusCode == false) return new AuthenticationRefreshResponseModel();
+
+            var cookieValue = JsonConvert.SerializeObject(result);
+            var encryptedAuthCookie = _crypto.Encrypt(_stravaPersonalBestsSettings.Value.CryptoSecret, cookieValue);
+            return new AuthenticationRefreshResponseModel(true, encryptedAuthCookie, result.AccessToken);
+        }
+
+        private AuthenticationRefreshRequestModel GetAuthenticationRefreshRequestModel(string refreshToken)
+        {
+            return new AuthenticationRefreshRequestModel
+            {
+                client_id = _stravaApiSettings.Value.ClientId,
+                client_secret = _stravaApiSettings.Value.ClientSecret,
+                refresh_token = refreshToken,
+                grant_type = "refresh_token"
+            };
         }
 
         private AuthenticationRequestModel GetAuthenticationRequestModel(string code)

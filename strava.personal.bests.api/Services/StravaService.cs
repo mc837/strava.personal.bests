@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using strava.personal.bests.api.Models;
-using strava.personal.bests.api.Models.Authentication;
 using strava.personal.bests.api.Services.Interfaces;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -21,7 +20,7 @@ namespace strava.personal.bests.api.Services
             _clientFactory = clientFactory;
         }
 
-        public async Task<HttpResponseMessage> GetToken(AuthenticationRequestModel requestBody)
+        public async Task<HttpResponseMessage> GetToken<T>(T requestBody)
         {
             var authRequest = JsonConvert.SerializeObject(requestBody);
             return await Post(authRequest, $"{_stravaApiSettings.BaseUrl}/oauth/token");
