@@ -2,8 +2,7 @@
 using Newtonsoft.Json;
 using strava.personal.bests.api.Filters;
 using strava.personal.bests.api.Models;
-using System.Net.Http;
-using System.Net.Http.Headers;
+using strava.personal.bests.api.Services.Interfaces;
 using System.Threading.Tasks;
 
 namespace strava.personal.bests.api.Controllers
@@ -11,11 +10,11 @@ namespace strava.personal.bests.api.Controllers
     [ApiController]
     public class AthleteController : CustomApiController
     {
-        private readonly IHttpClientFactory _clientFactory;
+        private readonly IStravaService _stravaService;
 
-        public AthleteController(IHttpClientFactory clientFactory)
+        public AthleteController(IStravaService stravaService)
         {
-            _clientFactory = clientFactory;
+            _stravaService = stravaService;
         }
 
         [AuthorizeStrava]
@@ -23,23 +22,15 @@ namespace strava.personal.bests.api.Controllers
         [Route("[action]")]
         public async Task<IActionResult> GetAthlete()
         {
-            HttpContext.Items.TryGetValue("access_token", out var accessToken);
-            var client = _clientFactory.CreateClient();
-
-            var request = new HttpRequestMessage(HttpMethod.Get, "https://www.strava.com/api/v3/athlete");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken.ToString());
-
-            var response = await client.SendAsync(request);
+            HttpContext.Items.TryGetValue("access_token", out var accessToken); // TODO: put in another filter then link to ctrl prop?
+            var response = await _stravaService.GetAthlete(accessToken.ToString());
             var content = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<Athlete>(content);
 
-            if (response.IsSuccessStatusCode)
-            {
-                var res = new OkObjectResult(result);
-                return res;
-            }
+            if (!response.IsSuccessStatusCode) return new BadRequestResult();
 
-            return new BadRequestResult();
+            var athlete = JsonConvert.DeserializeObject<Athlete>(content);
+
+            return new OkObjectResult(athlete);
         }
     }
 }

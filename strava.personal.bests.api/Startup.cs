@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using strava.personal.bests.api.Models;
 using strava.personal.bests.api.Services;
+using strava.personal.bests.api.Services.Interfaces;
 
 namespace strava.personal.bests.api
 {
@@ -23,8 +24,11 @@ namespace strava.personal.bests.api
             services.AddControllers();
             services.AddHttpClient();
             services.AddScoped<ICrypto, Crypto>();
-            services.Configure<StravaApiSettings>(Configuration.GetSection("stravaApi"));
-            services.Configure<StravaPersonalBestsSettings>(Configuration.GetSection("StravaPersonalBests"));
+            services.Configure<StravaApiSettings>(Configuration.GetSection("stravaApiSettings"));
+            services.Configure<StravaPersonalBestsSettings>(Configuration.GetSection("StravaPersonalBestsSettings"));
+            services.AddScoped<IStravaAuthService, StravaAuthService>();
+            services.AddScoped<IStravaService, StravaService>();
+            //TODO: Check scoping
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
