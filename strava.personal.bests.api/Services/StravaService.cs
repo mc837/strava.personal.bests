@@ -1,10 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using strava.personal.bests.api.Models;
 using strava.personal.bests.api.Services.Interfaces;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace strava.personal.bests.api.Services
@@ -22,28 +19,30 @@ namespace strava.personal.bests.api.Services
 
         public async Task<HttpResponseMessage> GetToken<T>(T requestBody)
         {
-            var authRequest = JsonConvert.SerializeObject(requestBody);
-            return await Post(authRequest, $"{_stravaApiSettings.BaseUrl}/oauth/token");
+            var request = new RequestBuilder()
+                .New(HttpMethod.Post, $"{_stravaApiSettings.BaseUrl}/oauth/token")
+                .WithContent(requestBody)
+                .Create();
+
+            return await Send(request);
         }
 
         public async Task<HttpResponseMessage> GetAthlete(string accessToken)
         {
-            return await Get(accessToken, $"{_stravaApiSettings.StravaApiV3BaseUrl}/athlete");
-        }
-
-        private async Task<HttpResponseMessage> Post(string content, string url)
-        {
-            var request = new HttpRequestMessage(HttpMethod.Post, url)
-            {
-                Content = new StringContent(content, Encoding.UTF8, "application/json")
-            };
+            var request = new RequestBuilder()
+                .New(HttpMethod.Get, $"{_stravaApiSettings.StravaApiV3BaseUrl}/athlete")
+                .WithAuthHeader(accessToken)
+                .Create();
 
             return await Send(request);
         }
-        private async Task<HttpResponseMessage> Get(string accessToken, string url)
+
+        public async Task<HttpResponseMessage> Deauthorize(string accessToken)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            var request = new RequestBuilder()
+                .New(HttpMethod.Post, $"{_stravaApiSettings.BaseUrl}/oauth/deauthorize")
+                .WithAuthHeader(accessToken)
+                .Create();
 
             return await Send(request);
         }

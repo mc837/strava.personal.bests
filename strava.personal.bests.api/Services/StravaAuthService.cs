@@ -51,6 +51,12 @@ namespace strava.personal.bests.api.Services
             return new AuthenticationRefreshResponseModel(true, encryptedAuthCookie, result.AccessToken);
         }
 
+        public async Task<DeauthorizeResponseModel> Deauthorize(string accessToken)
+        {
+            var getTokenResponse = await _stravaService.Deauthorize(accessToken);
+            return new DeauthorizeResponseModel(getTokenResponse.IsSuccessStatusCode);
+        }
+
         private AuthenticationRefreshRequestModel GetAuthenticationRefreshRequestModel(string refreshToken)
         {
             return new AuthenticationRefreshRequestModel

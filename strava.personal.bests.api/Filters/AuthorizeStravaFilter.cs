@@ -8,6 +8,7 @@ using strava.personal.bests.api.Services;
 using strava.personal.bests.api.Services.Interfaces;
 using System;
 using System.Threading.Tasks;
+using static System.String;
 
 namespace strava.personal.bests.api.Filters
 {
@@ -27,9 +28,10 @@ namespace strava.personal.bests.api.Filters
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             context.HttpContext.Request.Cookies.TryGetValue("spb", out var spbAuthCookie);
-            if (spbAuthCookie == null)
+            if (IsNullOrEmpty(spbAuthCookie))
             {
                 context.Result = new UnauthorizedResult();
+                return;
             }
 
             var decryptedCookie = _crypto.Decrypt(_settings.Value.CryptoSecret, spbAuthCookie);

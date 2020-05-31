@@ -7,5 +7,6 @@ namespace strava.personal.bests.api.Services.Interfaces
     {
         Task<AuthenticationResponseModel> GetToken(string code);
         Task<AuthenticationRefreshResponseModel> GetRefreshedToken(string code);
+        Task<DeauthorizeResponseModel> Deauthorize(string accessToken);
     }
 }
