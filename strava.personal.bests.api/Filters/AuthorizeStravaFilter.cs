@@ -6,6 +6,7 @@ using strava.personal.bests.api.Models;
 using strava.personal.bests.api.Models.Authentication;
 using strava.personal.bests.api.Services;
 using strava.personal.bests.api.Services.Interfaces;
+using System;
 using System.Threading.Tasks;
 
 namespace strava.personal.bests.api.Filters
@@ -34,8 +35,9 @@ namespace strava.personal.bests.api.Filters
             var decryptedCookie = _crypto.Decrypt(_settings.Value.CryptoSecret, spbAuthCookie);
             var stravaTokenModel = JsonConvert.DeserializeObject<StravaTokenModel>(decryptedCookie);
 
-            int.TryParse(stravaTokenModel.ExpiresIn, out var expirySeconds);
-            if (expirySeconds > 30)
+            long.TryParse(stravaTokenModel.ExpiresAt, out var tokenExpiry);
+
+            if (tokenExpiry - DateTimeOffset.UtcNow.ToUnixTimeSeconds() > 20000)
             {
                 context.HttpContext.Items["access_token"] = stravaTokenModel.AccessToken;
                 return;
@@ -49,6 +51,8 @@ namespace strava.personal.bests.api.Filters
             context.HttpContext.Items["access_token"] = refreshedAuthenticationResult.AccessToken;
         }
     }
+
+
 
     public class AuthorizeStravaAttribute : TypeFilterAttribute
     {
