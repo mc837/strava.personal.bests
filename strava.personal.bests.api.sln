@@ -3,16 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30002.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "strava.personal.bests.api", "strava.personal.bests.api.csproj", "{0E8887EA-F054-4913-BCD0-53DA02B148D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "strava.personal.bests.api", "strava.personal.bests.api\strava.personal.bests.api.csproj", "{0E8887EA-F054-4913-BCD0-53DA02B148D5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E0DAE928-C876-41AE-91C0-88763684D5F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "strava.personal.bests.api.tests", "..\strava.personal.bests.api.tests\strava.personal.bests.api.tests.csproj", "{3F197168-6587-4FD0-955C-CE7A7CE8ED19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "strava.personal.bests.api.tests", "strava.personal.bests.api.tests\strava.personal.bests.api.tests.csproj", "{3F197168-6587-4FD0-955C-CE7A7CE8ED19}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7B758065-D1AA-4A56-99E4-362C3638C843}"
 	ProjectSection(SolutionItems) = preProject
-		..\readme.md = ..\readme.md
+		.gitignore = .gitignore
+		readme.md = readme.md
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{FB9B67BE-6B31-4514-8F9F-4DC42FEE61E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +36,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{0E8887EA-F054-4913-BCD0-53DA02B148D5} = {FB9B67BE-6B31-4514-8F9F-4DC42FEE61E7}
 		{3F197168-6587-4FD0-955C-CE7A7CE8ED19} = {E0DAE928-C876-41AE-91C0-88763684D5F4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
