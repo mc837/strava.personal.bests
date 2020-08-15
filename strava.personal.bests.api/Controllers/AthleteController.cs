@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using strava.personal.bests.api.Filters;
 using strava.personal.bests.api.Models;
@@ -18,6 +19,7 @@ namespace strava.personal.bests.api.Controllers
         }
 
         [AuthorizeStrava]
+        [EnableCors("Policy1")]
         [HttpGet]
         [Route("[action]")]
         public async Task<IActionResult> GetAthlete()

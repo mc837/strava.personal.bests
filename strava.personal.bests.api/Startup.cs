@@ -28,6 +28,11 @@ namespace strava.personal.bests.api
             services.Configure<StravaPersonalBestsSettings>(Configuration.GetSection("StravaPersonalBestsSettings"));
             services.AddScoped<IStravaAuthService, StravaAuthService>();
             services.AddScoped<IStravaService, StravaService>();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("Policy1",
+                    builder => { builder.AllowCredentials().WithOrigins("https://localhost:3000").AllowAnyHeader(); });
+            });
             //TODO: Check scoping
         }
 
@@ -43,12 +48,15 @@ namespace strava.personal.bests.api
 
             app.UseRouting();
 
+            app.UseCors();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+
         }
     }
 }

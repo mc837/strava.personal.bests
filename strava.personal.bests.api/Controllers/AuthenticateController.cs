@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using strava.personal.bests.api.Filters;
 using strava.personal.bests.api.Models.Authentication;
 using strava.personal.bests.api.Services.Interfaces;
@@ -18,6 +20,7 @@ namespace strava.personal.bests.api.Controllers
             _stravaAuthService = stravaAuthService;
         }
 
+        [EnableCors("Policy1")]
         [HttpPost]
         [Route("[action]")]
         public async Task<IActionResult> GetToken([FromBody] GetToken getTokenModel)
@@ -29,12 +32,17 @@ namespace strava.personal.bests.api.Controllers
             Response.Cookies.Append(
                 "spb", authenticationResult.EncryptedAuthCookie, new Microsoft.AspNetCore.Http.CookieOptions
                 {
-                    Expires = DateTime.UtcNow.AddDays(10)
+
+                    Expires = DateTime.UtcNow.AddDays(10),
+                    HttpOnly = false,
+                    SameSite = SameSiteMode.Lax,
+                    //Secure = true
                 });
 
             return new OkObjectResult(authenticationResult.Athlete);
         }
 
+        //[EnableCors("Policy1")]
         [AuthorizeStrava]
         [HttpPost]
         [Route("[action]")]
